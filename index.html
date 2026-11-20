@@ -48,11 +48,16 @@ onclick="add('3')">3</button> <button onclick="add('-')">-</button><br>
 onclick="calculer()">=</button> <button onclick="add('+')">+</button>
 <h3>Historique</h3>
 <ul id="historique"></ul>..</section>
-<section id="todo" class="page">.<h2>Ma To-Do List</h2>
+<section id="todo" class="page"<p id="compteur">Tâches en cours : 0</p>
+<button type="button" onclick="toutSupprimerTaches()">Tout supprimer</button>
+>.<h2>Ma To-Do List</h2>
 <input type="text" id="tacheInput" placeholder="Nouvelle tâche...">
 <button onclick="ajouterTache()">Ajouter</button>
 <ul id="listeTaches"></ul>..</section>
-<section id="galerie" class="page">.<h2>Galerie d'Images</h2>
+<section id="galerie" class="page"<br><br>
+<button type="button" onclick="demarrerDiaporama()">Démarrer le diaporama</button>
+<button type="button" onclick="arreterDiaporama()">Arrêter</button>
+>.<h2>Galerie d'Images</h2>
 <label>Taille (px) :</label>
 <input type="range" min="100" max="400" value="200" oninput="redimensionner(this.value)"><span id="valeurwidth">200</span>px
 <br><br>
@@ -61,11 +66,23 @@ src="image1.jpg"
 width="200"
 onmouseover="this.src='image2.jpg'"
 onmouseout="this.src='image1.jpg'">..</section>
-<section id="puzzle" class="page"><h2>Puzzle 3x3</h2>
+<section id="puzzle" class="page"<p id="compteurCoups">Coups : 0</p>
+><h2>Puzzle 3x3</h2>
 <div id="plateau"></div>
 <br>
 <button onclick="melanger()">Mélanger</button>...</section>
-<section id="quiz" class="page"><h2>Quiz JavaScript</h2>
+<section id="quiz" class="page"<hr style="margin: 20px 0;">
+<h3>Historique des tentatives</h3>
+<label for="filtreScore">Filtrer : </label>
+<select id="filtreScore" onchange="filtrerHistoriqueQuiz()">
+  <option value="all">Toutes</option>
+  <option value="pass">Réussies (score >= 3)</option>
+  <option value="fail">À réviser (score < 3)</option>
+</select>
+<ul id="historiqueQuiz" style="margin-top: 10px;"></ul>
+ ><h2>Quiz JavaScript</h2>
+  <p>Temps restant : <strong id="timerQuiz">30</strong> s</p>
+
 <form id="quizForm">
 <div class="question-block">
 <p><strong>Q1. Que signifie DOM ?</strong></p>
@@ -79,8 +96,6 @@ onmouseout="this.src='image1.jpg'">..</section>
 <label><input type="radio" name="q2" value="A"> getElementById()</label><br>
 <label><input type="radio" name="q2" value="B"> selectId()</label><br>
 <label><input type="radio" name="q2" value="C"> queryID()</label>
-
-11
 
 </div>
 <div class="question-block" style="margin-top: 15px;">
@@ -106,6 +121,7 @@ onmouseout="this.src='image1.jpg'">..</section>
 </form>
 <div id="resultatQuiz" style="margin-top: 20px; font-weight: bold; font-size: 1.1em; color:
 #1e3a8a;"></div></section>
+ 
 <script src="script.js"></script>
 </body>
 </html>
