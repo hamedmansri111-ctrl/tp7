@@ -23,15 +23,94 @@ ecran.value = res;
 ecran.value = 'Erreur';
 }
 }
-function ajouterTache() {
-let input = document.getElementById('tacheInput');
-if (input.value.trim() === '') return;
-let li = document.createElement('li');
-li.innerHTML = `<span onclick="this.style.textDecoration='line-through'">${input.value}</span>
-<button onclick="this.parentElement.remove()">X</button>`;
-document.getElementById('listeTaches').appendChild(li);
-input.value = '';
+let tachesData = JSON.parse(localStorage.getItem('taches')) || [];
+
+function sauvegarderEtAfficherTaches() {
+  localStorage.setItem('taches', JSON.stringify(tachesData));
+  const ul = document.getElementById('listeTaches');
+  ul.innerHTML = '';
+
+  tachesData.forEach((tache, index) => {
+    const li = document.createElement('li');
+    li.innerHTML = `
+      <span onclick="basculerTache(${index})" style="cursor:pointer; text-decoration:${tache.done ? 'line-through' : 'none'}">${tache.texte}</span>
+      <button type="button" onclick="supprimerTache(${index})">X</button>
+    `;
+    ul.appendChild(li);
+  });
+
+  document.getElementById('compteur').textContent = `Tâches en cours : ${tachesData.length}`;
 }
+
+function ajouterTache() {
+  const input = document.getElementById('tacheInput');
+  if (input.value.trim() === '') return;
+  tachesData.push({ texte: input.value.trim(), done: false });
+  input.value = '';
+  sauvegarderEtAfficherTaches();
+}
+
+function basculerTache(index) {
+  tachesData[index].done = !tachesData[index].done;
+  sauvegarderEtAfficherTaches();
+}
+
+function supprimerTache(index) {
+  tachesData.splice(index, 1);
+  sauvegarderEtAfficherTaches();
+}
+
+function toutSupprimerTaches() {
+  tachesData = [];
+  sauvegarderEtAfficherTaches();
+}
+
+sauvegarderEtAfficherTaches();
+
+
+function sauvegarderEtAfficherTaches() {
+  localStorage.setItem('taches', JSON.stringify(tachesData));
+  const ul = document.getElementById('listeTaches');
+  ul.innerHTML = '';
+
+  tachesData.forEach((tache, index) => {
+    const li = document.createElement('li');
+    li.innerHTML = `
+      <span onclick="basculerTache(${index})" style="cursor:pointer; text-decoration:${tache.done ? 'line-through' : 'none'}">${tache.texte}</span>
+      <button type="button" onclick="supprimerTache(${index})">X</button>
+    `;
+    ul.appendChild(li);
+  });
+
+  document.getElementById('compteur').textContent = `Tâches en cours : ${tachesData.length}`;
+}
+
+function ajouterTache() {
+  const input = document.getElementById('tacheInput');
+  if (input.value.trim() === '') return;
+  tachesData.push({ texte: input.value.trim(), done: false });
+  input.value = '';
+  sauvegarderEtAfficherTaches();
+}
+
+function basculerTache(index) {
+  tachesData[index].done = !tachesData[index].done;
+  sauvegarderEtAfficherTaches();
+}
+
+function supprimerTache(index) {
+  tachesData.splice(index, 1);
+  sauvegarderEtAfficherTaches();
+}
+
+function toutSupprimerTaches() {
+  tachesData = [];
+  sauvegarderEtAfficherTaches();
+}
+
+sauvegarderEtAfficherTaches();
+('li');
+li.innerHTML
 function redimensionner(taille) {
 document.getElementById('monImage').width = taille;
 document.getElementById("valeurwidth").innerHTML=taille;}
@@ -46,15 +125,29 @@ div.textContent = val;
 div.onclick = () => jouer(i);
 plateau.appendChild(div);
 }); }
+let coups = 0;
+
 function jouer(i) {
-let vide = grille.indexOf('');
-// Vérifier si la case sélectionnée est voisine de la case vide (gauche, droite, haut, bas)
-let diff = Math.abs(i - vide);
-if (diff === 1 || diff === 3) {
-[grille[i], grille[vide]] = [grille[vide], grille[i]];
-afficher();
+  let vide = grille.indexOf('');
+  let diff = Math.abs(i - vide);
+  if (diff === 1 || diff === 3) {
+    [grille[i], grille[vide]] = [grille[vide], grille[i]];
+    coups++;
+    document.getElementById('compteurCoups').textContent = `Coups : ${coups}`;
+    afficher();
+    verifierVictoire();
+  }
 }
+
+function verifierVictoire() {
+  const etatGagnant = [1, 2, 3, 4, 5, 6, 7, 8, ''];
+  const gagne = grille.every((val, idx) => val === etatGagnant[idx]);
+  if (gagne) {
+    alert(`Félicitations ! Vous avez gagné en ${coups} coups !`);
+  }
 }
+
+// Vérifier si la case sélectionnée est voisine de la case vide 
 function melanger() {
 grille.sort(() => Math.random() - 0.5);
 afficher();
@@ -77,4 +170,64 @@ divResultat.innerHTML+="Excellant";
 }
 else if(score>=3){
     divResultat.innerHTML+="Bon travail";
-}else {divResultat.innerHTML+="Refusez"}}
+}else {divResultat.innerHTML+="Refusez"}
+ajouterTentativeQuiz(score);
+function ajouterTentativeQuiz(score) {
+  const liste = document.getElementById('historiqueQuiz');
+  const li = document.createElement('li');
+  const statut = score >= 3 ? 'pass' : 'fail';
+  const heure = new Date().toLocaleTimeString();
+
+  li.dataset.statut = statut;
+  li.innerHTML = `
+    <span>Score : <strong>${score} / 5</strong> (${heure})</span>
+    <button type="button" onclick="this.parentElement.remove()" style="margin-left: 10px;">Supprimer</button>
+  `;
+
+  liste.appendChild(li);
+  filtrerHistoriqueQuiz();
+}
+
+function filtrerHistoriqueQuiz() {
+  const filtre = document.getElementById('filtreScore').value;
+  const items = document.querySelectorAll('#historiqueQuiz li');
+
+  items.forEach(item => {
+    if (filtre === 'all' || item.dataset.statut === filtre) {
+      item.style.display = 'list-item';
+    } else {
+      item.style.display = 'none';
+    }
+  });
+}const imagesDiaporama = ["image1.jpg", "image2.jpg", "image3.jpg"];
+let indexImage = 0;
+let intervalDiaporama = null;
+
+function demarrerDiaporama() {
+  if (intervalDiaporama !== null) return;
+  intervalDiaporama = setInterval(() => {
+    indexImage = (indexImage + 1) % imagesDiaporama.length;
+    document.getElementById('monImage').src = imagesDiaporama[indexImage];
+  }, 2000);
+}
+
+function arreterDiaporama() {
+  clearInterval(intervalDiaporama);
+  intervalDiaporama = null;
+}
+
+
+}
+let tempsRestant = 30;
+
+const chronoQuiz = setInterval(() => {
+  tempsRestant--;
+  const elTimer = document.getElementById('timerQuiz');
+  if (elTimer) elTimer.textContent = tempsRestant;
+
+  if (tempsRestant <= 0) {
+    clearInterval(chronoQuiz);
+    evaluerQuiz();
+  }
+}, 1000);
+
